@@ -15,6 +15,9 @@ class Minimax:
             return board[0][0]
         if board[0][2] == board[1][1] == board[2][0] != "":
             return board[0][2]
+        
+        if all(cell != "" for row in board for cell in row):
+            return "A"
 
         return None
 
@@ -28,7 +31,7 @@ class Minimax:
         return empty_cells
 
     # crea el árbol
-    def minimax(self, node, is_maximizing):
+    def build_game_tree(self, node, is_maximizing):
         winner = self.check_winner(node.value)
         
         if winner is not None:
@@ -36,10 +39,8 @@ class Minimax:
                 node.winner = 1
             elif winner == "X":
                 node.winner = -1
-            return
-
-        if all(cell != "" for row in node.value for cell in row):
-            node.winner = 0
+            elif winner == "A":
+                node.winner = 0
             return
 
         empty_cells = self.get_empty_cells(node.value)
@@ -54,7 +55,7 @@ class Minimax:
 
             child_node = Tree(new_board)
             node.children.append(child_node)
-            self.minimax(child_node, not is_maximizing)
+            self.build_game_tree(child_node, not is_maximizing)
 
     # chequea si ese arbol lleva a una victoria
     def check_best_move(self, tree, is_maximizing=True):
@@ -83,7 +84,7 @@ class Minimax:
             new_board[cell[0]][cell[1]] = "O"
             
             tree = Tree(new_board)
-            self.minimax(tree, False)
+            self.build_game_tree(tree, False)
 
             move_value = self.check_best_move(tree, False)
 
